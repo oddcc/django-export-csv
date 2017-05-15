@@ -7,12 +7,12 @@ SECRET_KEY = 'HARD_TO_GUESS'
 DEBUG = True
 
 INSTALLED_APPS = (
-    'export_csv'
+    'export_csv',
 )
 
 MIDDLEWARE_CLASSES = ()
 
-ROOT_URLCONF = 'demo_app.urls'
+ROOT_URLCONF = 'export_csv.urls'
 
 DATABASES = {
     'default': {
