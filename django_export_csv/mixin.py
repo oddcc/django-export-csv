@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 import datetime
 import unicodecsv as csv
 import codecs
 
 from django.core.exceptions import ValidationError
-from django.utils.text import slugify
 from django.http import StreamingHttpResponse
 
 
@@ -18,10 +16,16 @@ class QueryCsvMixin(object):
     field_serializer_map = {}
 
     class Echo(object):
+        """
+        An file-like object that implements just the write method.
+        """
         def write(self, value):
             return value
 
     def render_csv_response(self, queryset):
+        """
+        making a CSV streaming http response, take a queryset
+        """
         if self.filename:
             filename = self._clean_filename(self.filename)
             if self.add_datestamp:
@@ -34,7 +38,8 @@ class QueryCsvMixin(object):
         response = StreamingHttpResponse(
             self._iter_csv(queryset, self.Echo()), **response_args)
 
-        response['Content-Disposition'] = 'attachment; filename=%s;' % filename
+        # support chinese filename
+        response['Content-Disposition'] = b'attachment; filename=%s;' % filename.encode(encoding='utf-8')
         response['Cache-Control'] = 'no-cache'
 
         return response
@@ -44,7 +49,7 @@ class QueryCsvMixin(object):
             if not filename.endswith('.csv'):
                 raise ValidationError('file extension should be .csv')
         else:
-            filename = "{}.csv".format(filename)
+            filename = "%s.csv" % filename
         return filename
 
     def _add_datestamp(self, filename):
@@ -62,9 +67,14 @@ class QueryCsvMixin(object):
             filename = self._add_datestamp(filename)
         return filename
 
-    def _iter_csv(self, queryset, file_obj, **kwargs):
+    def _iter_csv(self, queryset, file_obj):
+        """
+        Writes CSV data to a file object based on the
+        contents of the queryset and yields each row.
+        """
         csv_kwargs = {'encoding': 'utf-8'}
 
+        # add BOM to support MS Excel (for Windows only)
         yield file_obj.write(codecs.BOM_UTF8)
 
         if type(queryset).__name__ == 'ValuesQuerySet':
