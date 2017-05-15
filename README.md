@@ -11,10 +11,17 @@ support custom CSV file in this ways:
 6. custom CSV header row
 7. custom serializer field
 
+## install
+Run:
+```
+pip install django-export-csv
+```
+Support Python 2.7 and 3.5, Django >= 1.8.
+
 ## usage
 let your Class-based views which inherit `ListView` or `MultipleObjectMixin` also inherit `QueryCsvMixin`, then you can use `render_csv_response` to turn a queryset into a response with a CSV attachment. `render_csv_response` takes a `QuerySet` or a `ValuesQuerySet` instance:
 
-```
+```python
 from django_export_csv.mixin import QueryCsvMixin
 from django.views.generic.list import ListView
 
@@ -39,7 +46,7 @@ once you inherit `QueryCsvMixin`, then you can use following arguments to custom
 
 e.g:
 
-```
+```python
 # data_init.py
 import datetime
 from .models import Student, College
@@ -63,7 +70,7 @@ def create_student_and_get_queryset():
 
 ```
 
-```
+```python
 # views.py
 from django_export_csv.mixin import QueryCsvMixin
 from django.views.generic.list import ListView
