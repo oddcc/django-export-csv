@@ -22,7 +22,7 @@ Support Python 2.7 and 3.5, Django >= 1.8.
 let your Class-based views which inherit `ListView` or `MultipleObjectMixin` also inherit `QueryCsvMixin`, then you can use `render_csv_response` to turn a queryset into a response with a CSV attachment. `render_csv_response` takes a `QuerySet` or a `ValuesQuerySet` instance:
 
 ```python
-from django_export_csv.mixin import QueryCsvMixin
+from django_export_csv import QueryCsvMixin
 from django.views.generic.list import ListView
 
 from .models import Student
@@ -72,7 +72,7 @@ def create_student_and_get_queryset():
 
 ```python
 # views.py
-from django_export_csv.mixin import QueryCsvMixin
+from django_export_csv import QueryCsvMixin
 from django.views.generic.list import ListView
 
 from .models import Student

@@ -1,7 +1,8 @@
 from django.conf.urls import url
-from export_csv import views
+from . import views
 
 
 urlpatterns = (
-    url(r'^$', views.StudentListView.as_view(), name='get_csv'),
+    url(r'^$', views.StudentListView.as_view()),
+    url(r'^function$', views.student_list_view),
 )
