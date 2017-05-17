@@ -14,11 +14,13 @@ class QueryCsvMixin(object):
     field_order = []
     field_header_map = {}
     field_serializer_map = {}
+    extra_field = []
 
     class Echo(object):
         """
         An file-like object that implements just the write method.
         """
+
         def write(self, value):
             return value
 
@@ -91,21 +93,33 @@ class QueryCsvMixin(object):
         field_names = [field_name for field_name in field_names if field_name in self.field_order] + \
                       [field_name for field_name in field_names if field_name not in self.field_order]
 
+        field_names = self.extra_field + field_names
+
         writer = csv.DictWriter(file_obj, field_names, **csv_kwargs)
 
         header_map = dict((field, field) for field in field_names)
         if self.use_verbose_names:
-            header_map.update(
-                dict((field.name, field.verbose_name)
-                     for field in queryset.model._meta.fields
-                     if field.name in field_names))
+            for field in queryset.model._meta.get_fields():
+                if field.name in field_names:
+                    try:
+                        header_map[field.name] = field.verbose_name
+                    except AttributeError:
+                        header_map[field.name] = field.name
+
         header_map.update(self.field_header_map)
 
         yield writer.writerow(header_map)
 
-        for item in queryset_values:
-            item = self._sanitize_item(self.field_serializer_map, item)
-            yield writer.writerow(item)
+        if self.extra_field:
+            model = queryset_values.model
+            for item in queryset_values:
+                item = self._sanitize_related_item(self.field_serializer_map, item, model)
+                item = self._sanitize_item(self.field_serializer_map, item)
+                yield writer.writerow(item)
+        else:
+            for item in queryset_values:
+                item = self._sanitize_item(self.field_serializer_map, item)
+                yield writer.writerow(item)
 
     def _sanitize_item(self, field_serializer_map, item):
         def _serialize_value(value):
@@ -118,6 +132,9 @@ class QueryCsvMixin(object):
         for key, val in item.items():
             if key in self.exclude_field:
                 continue
+            if key in self.extra_field:
+                obj[key] = val
+                continue
             if val is not None:
                 serializer = field_serializer_map.get(key, _serialize_value)
                 newval = serializer(val)
@@ -125,3 +142,10 @@ class QueryCsvMixin(object):
                     newval = str(newval)
                 obj[key] = newval
         return obj
+
+    def _sanitize_related_item(self, field_serializer_map, item, model):
+        obj = model.objects.get(id=item['id'])
+        for field_name in self.extra_field:
+            serializer = field_serializer_map.get(field_name)
+            item[field_name] = serializer(obj)
+        return item

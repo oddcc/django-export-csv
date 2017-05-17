@@ -7,10 +7,14 @@ from .data_init import create_student_and_get_queryset
 
 
 def boolean_serializer(value):
-    if value == True:
+    if value:
         return 'Y'
     else:
         return 'N'
+
+
+def college_serializer(obj):
+    return obj.college.name
 
 
 class StudentListView(QueryCsvMixin, ListView):
@@ -20,8 +24,9 @@ class StudentListView(QueryCsvMixin, ListView):
     exclude_field = ['id']
     field_order = ['name', 'is_graduated']
     field_header_map = {'is_graduated': 'Graduated'}
-    field_serializer_map = {'is_graduated': boolean_serializer}
+    field_serializer_map = {'is_graduated': boolean_serializer, 'college': college_serializer}
     queryset = Student.objects.all()
+    extra_field = ['college']
 
     def get(self, *args, **kwargs):
         queryset = create_student_and_get_queryset()
