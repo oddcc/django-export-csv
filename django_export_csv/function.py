@@ -2,17 +2,10 @@ import datetime
 import unicodecsv as csv
 import codecs
 
-from django.core.exceptions import ValidationError
 from django.http import StreamingHttpResponse
 
-
-class _Echo(object):
-    """
-    An file-like object that implements just the write method.
-    """
-
-    def write(self, value):
-        return value
+from .utils import generate_filename, attach_datestamp, clean_filename
+from .utils import Echo
 
 
 def render_csv_response(queryset, filename=None, add_datestamp=False, **kwargs):
@@ -20,47 +13,22 @@ def render_csv_response(queryset, filename=None, add_datestamp=False, **kwargs):
     entry function, making a CSV streaming http response, take a queryset
     """
     if filename:
-        filename = _clean_filename(filename)
+        filename = clean_filename(filename)
         if add_datestamp:
-            filename = _add_datestamp(filename)
+            filename = attach_datestamp(filename)
     else:
-        filename = _generate_filename(queryset, add_datestamp)
+        filename = generate_filename(queryset, add_datestamp)
 
     response_args = {'content_type': 'text/csv'}
 
     response = StreamingHttpResponse(
-        _iter_csv(queryset, _Echo(), **kwargs), **response_args)
+        _iter_csv(queryset, Echo(), **kwargs), **response_args)
 
     # support chinese filename
     response['Content-Disposition'] = b'attachment; filename=%s;' % filename.encode(encoding='utf-8')
     response['Cache-Control'] = 'no-cache'
 
     return response
-
-
-def _clean_filename(filename):
-    if '.' in filename:
-        if not filename.endswith('.csv'):
-            raise ValidationError('file extension should be .csv')
-    else:
-        filename = "%s.csv" % filename
-    return filename
-
-
-def _add_datestamp(filename):
-    if filename != _clean_filename(filename):
-        raise ValidationError('filename must be cleaned first')
-
-    date_string = datetime.date.today().strftime("%Y%m%d")
-    return '%s_%s.csv' % (filename[:-4], date_string)
-
-
-def _generate_filename(queryset, add_datestamp):
-    filename = queryset.model._meta.model_name
-    filename = _clean_filename(filename)
-    if add_datestamp:
-        filename = _add_datestamp(filename)
-    return filename
 
 
 def _iter_csv(queryset, file_obj, **kwargs):

@@ -2,8 +2,10 @@ import datetime
 import unicodecsv as csv
 import codecs
 
-from django.core.exceptions import ValidationError
 from django.http import StreamingHttpResponse
+
+from .utils import clean_filename, attach_datestamp, generate_filename
+from .utils import Echo
 
 
 class QueryCsvMixin(object):
@@ -16,58 +18,27 @@ class QueryCsvMixin(object):
     field_serializer_map = {}
     extra_field = []
 
-    class Echo(object):
-        """
-        An file-like object that implements just the write method.
-        """
-
-        def write(self, value):
-            return value
-
     def render_csv_response(self, queryset):
         """
         making a CSV streaming http response, take a queryset
         """
         if self.filename:
-            filename = self._clean_filename(self.filename)
+            filename = clean_filename(self.filename)
             if self.add_datestamp:
-                filename = self._add_datestamp(filename)
+                filename = attach_datestamp(filename)
         else:
-            filename = self._generate_filename()
+            filename = generate_filename(queryset, self.add_datestamp)
 
         response_args = {'content_type': 'text/csv'}
 
         response = StreamingHttpResponse(
-            self._iter_csv(queryset, self.Echo()), **response_args)
+            self._iter_csv(queryset, Echo()), **response_args)
 
         # support chinese filename
         response['Content-Disposition'] = b'attachment; filename=%s;' % filename.encode(encoding='utf-8')
         response['Cache-Control'] = 'no-cache'
 
         return response
-
-    def _clean_filename(self, filename):
-        if '.' in filename:
-            if not filename.endswith('.csv'):
-                raise ValidationError('file extension should be .csv')
-        else:
-            filename = "%s.csv" % filename
-        return filename
-
-    def _add_datestamp(self, filename):
-        if filename != self._clean_filename(filename):
-            raise ValidationError('filename must be cleaned first')
-
-        date_string = datetime.date.today().strftime("%Y%m%d")
-        return '%s_%s.csv' % (filename[:-4], date_string)
-
-    def _generate_filename(self):
-        queryset = self.get_queryset()
-        filename = queryset.model._meta.model_name
-        filename = self._clean_filename(filename)
-        if self.add_datestamp:
-            filename = self._add_datestamp(filename)
-        return filename
 
     def _iter_csv(self, queryset, file_obj):
         """
