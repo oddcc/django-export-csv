@@ -55,7 +55,8 @@ once you inherit `QueryCsvMixin`, then you can use following arguments to custom
 4. `exclude_field` - (default: `[]`), this should be a list which include field's name you don't want to export.
 5. `field_order` - (default: `[]`), this should be a list to determine field order, any fields not specified will follow those in the list.
 6. `field_header_map` - (default: `{}`), A dictionary mapping model field's name to CSV column header name. Has a higher priority than the `use_verbose_names`.
-7. `field_serializer_map` - (default: `{}`), A dictionary mapping model field's name to field serializer which take field's value and return serializered value
+7. `field_serializer_map` - (default: `{}`), A dictionary mapping model field's name to field serializer which take field's value and return serializered value.
+8. `extra_field` - (default: `[]`), should be a list. Used to customize foreign key(many-to-one), many-to-many relationships, foreign key reverse query(one-to-many), or other customize fields. Note that fields in `extra_field` must be a corresponding serializer in `field_serializer_map` to work. 
 
 e.g:
 
@@ -98,6 +99,10 @@ def boolean_serializer(value):
         return 'Y'
     else:
         return 'N'
+        
+        
+def college_serializer(obj):
+    return obj.college.name
 
 
 # CBV
@@ -108,8 +113,9 @@ class StudentListView(QueryCsvMixin, ListView):
     exclude_field = ['id']
     field_order = ['name', 'is_graduated']
     field_header_map = {'is_graduated': 'Graduated'}
-    field_serializer_map = {'is_graduated': boolean_serializer}
+    field_serializer_map = {'is_graduated': boolean_serializer, 'college': college_serializer}
     queryset = Student.objects.all()
+    extra_field = ['college']
 
     def get(self, *args, **kwargs):
         queryset = create_student_and_get_queryset()
@@ -124,13 +130,14 @@ def student_list_view(request):
     exclude_field = ['id']
     field_order = ['name', 'is_graduated']
     field_header_map = {'is_graduated': 'Graduated'}
-    field_serializer_map = {'is_graduated': boolean_serializer}
+    field_serializer_map = {'is_graduated': boolean_serializer, 'college': college_serializer}
+    extra_field = ['college']
 
     if request.method == 'GET':
         queryset = create_student_and_get_queryset()
         return render_csv_response(
             queryset, filename=filename, add_datestamp=add_datestamp, use_verbose_names=use_verbose_names,
             exclude_field=exclude_field, field_order=field_order, field_header_map=field_header_map,
-            field_serializer_map=field_serializer_map
+            field_serializer_map=field_serializer_map, extra_field=extra_field
         )
 ```

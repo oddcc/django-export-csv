@@ -90,6 +90,9 @@ def _iter_csv(queryset, file_obj, **kwargs):
         field_names = [field_name for field_name in field_names if field_name in field_order] + \
                       [field_name for field_name in field_names if field_name not in field_order]
 
+    extra_field = kwargs.get('extra_field', [])
+    field_names = extra_field + field_names
+
     writer = csv.DictWriter(file_obj, field_names, **csv_kwargs)
 
     header_map = dict((field, field) for field in field_names)
@@ -97,21 +100,34 @@ def _iter_csv(queryset, file_obj, **kwargs):
     use_verbose_names = kwargs.get('use_verbose_names', True)
 
     if use_verbose_names:
-        header_map.update(
-            dict((field.name, field.verbose_name)
-                 for field in queryset.model._meta.fields
-                 if field.name in field_names))
+        for field in queryset.model._meta.get_fields():
+            if field.name in field_names:
+                try:
+                    header_map[field.name] = field.verbose_name
+                except AttributeError:
+                    header_map[field.name] = field.name
 
     header_map.update(kwargs.get('field_header_map', {}))
 
     yield writer.writerow(header_map)
 
-    for item in queryset_values:
-        item = _sanitize_item(item, **kwargs)
-        yield writer.writerow(item)
+    # for item in queryset_values:
+    #     item = _sanitize_item(item, **kwargs)
+    #     yield writer.writerow(item)
+
+    if extra_field:
+        model = queryset_values.model
+        for item in queryset_values:
+            item = _sanitize_related_item(item, model, **kwargs)
+            item = _sanitize_item(item, **kwargs)
+            yield writer.writerow(item)
+    else:
+        for item in queryset_values:
+            item = _sanitize_item(item, **kwargs)
+            yield writer.writerow(item)
 
 
-def _sanitize_item(item, field_serializer_map={}, **kwargs):
+def _sanitize_item(item, **kwargs):
     def _serialize_value(value):
         if isinstance(value, datetime.datetime):
             return value.isoformat()
@@ -119,8 +135,15 @@ def _sanitize_item(item, field_serializer_map={}, **kwargs):
             return str(value)
 
     obj = {}
+    exclude_field = kwargs.get('exclude_field', [])
+    extra_field = kwargs.get('extra_field', [])
+    field_serializer_map = kwargs.get('field_serializer_map', {})
+
     for key, val in item.items():
-        if key in kwargs.get('exclude_field', []):
+        if key in exclude_field:
+            continue
+        if key in extra_field:
+            obj[key] = val
             continue
         if val is not None:
             serializer = field_serializer_map.get(key, _serialize_value)
@@ -129,3 +152,14 @@ def _sanitize_item(item, field_serializer_map={}, **kwargs):
                 newval = str(newval)
             obj[key] = newval
     return obj
+
+
+def _sanitize_related_item(item, model, **kwargs):
+    obj = model.objects.get(id=item['id'])
+    extra_field = kwargs.get('extra_field', [])
+    field_serializer_map = kwargs.get('field_serializer_map', {})
+
+    for field_name in extra_field:
+        serializer = field_serializer_map.get(field_name)
+        item[field_name] = serializer(obj)
+    return item

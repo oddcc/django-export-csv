@@ -40,12 +40,13 @@ def student_list_view(request):
     exclude_field = ['id']
     field_order = ['name', 'is_graduated']
     field_header_map = {'is_graduated': 'Graduated'}
-    field_serializer_map = {'is_graduated': boolean_serializer}
+    field_serializer_map = {'is_graduated': boolean_serializer, 'college': college_serializer}
+    extra_field = ['college']
 
     if request.method == 'GET':
         queryset = create_student_and_get_queryset()
         return render_csv_response(
             queryset, filename=filename, add_datestamp=add_datestamp, use_verbose_names=use_verbose_names,
             exclude_field=exclude_field, field_order=field_order, field_header_map=field_header_map,
-            field_serializer_map=field_serializer_map
+            field_serializer_map=field_serializer_map, extra_field=extra_field
         )
