@@ -10,6 +10,7 @@ support custom CSV file in this ways:
 5. custom field order
 6. custom CSV header row
 7. custom serializer field
+8. custom field(handle many-to-one, many-to-many, one-to-many relationship)
 
 ## install
 Run:
