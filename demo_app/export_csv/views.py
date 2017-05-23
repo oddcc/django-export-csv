@@ -3,7 +3,7 @@ from django_export_csv import render_csv_response
 from django.views.generic.list import ListView
 
 from .models import Student
-from .data_init import create_student_and_get_queryset
+from .data_init import create_student_and_get_queryset, create_college_and_get_queryset
 
 
 def boolean_serializer(value):
@@ -25,12 +25,21 @@ class StudentListView(QueryCsvMixin, ListView):
     field_order = ['name', 'is_graduated']
     field_header_map = {'is_graduated': 'Graduated'}
     field_serializer_map = {'is_graduated': boolean_serializer, 'college': college_serializer}
-    queryset = Student.objects.all()
+    queryset = create_student_and_get_queryset()
     extra_field = ['college']
 
     def get(self, *args, **kwargs):
-        queryset = create_student_and_get_queryset()
-        return self.render_csv_response(queryset)
+        return self.render_csv_response(self.get_queryset())
+
+
+class CollegeListView(QueryCsvMixin, ListView):
+    filename = 'export_college_list'
+    add_datestamp = True
+    use_verbose_names = True
+    queryset = create_college_and_get_queryset()
+
+    def get(self, *args, **kwargs):
+        return self.render_csv_response(self.get_queryset())
 
 
 def student_list_view(request):
