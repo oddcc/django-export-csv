@@ -2,7 +2,6 @@ from django_export_csv import QueryCsvMixin
 from django_export_csv import render_csv_response
 from django.views.generic.list import ListView
 
-from .models import Student
 from .data_init import create_student_and_get_queryset, create_college_and_get_queryset
 
 
