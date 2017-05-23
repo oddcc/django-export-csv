@@ -1,4 +1,5 @@
 # django-export-csv
+[中文文档](https://github.com/oddcc/django-export-csv/blob/master/README_CN.md)
 ## Introduction
 a CSV exporter for Django
 this tool create a shortcut to render a queryset to a CSV steaming HTTP response. 
