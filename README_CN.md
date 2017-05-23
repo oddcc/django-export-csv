@@ -58,7 +58,7 @@ def student_list_view(request):
 5. `field_order` - (default: `[]`), 是个列表, 可以把想定义排序的字段名写在里面, 导出的CSV会优先按顺序排列这个参数指定的字段, 再排剩下的字段.
 6. `field_header_map` - (default: `{}`), 是个字典, 用于自定义表头, key应该是字段名, value是表头中显示的内容, 这个参数的优先级比verbose_name高.
 7. `field_serializer_map` - (default: `{}`), 是个字典, 用于自定义serializer, key是字段名, value是对应的函数名, 这个函数应该接收一个值并返回相应的内容.
-8. `extra_field` - (default: `[]`), 是个列表, 用于定义不在数据库表中但又与model相关的字段, 比如外键的反向查询, 多对多关系等等, 也可以用于定义任意字段. 注意如果指定了`extra_field`参数, `field_serializer_map`中必须有相应的serializer配合才能工作.
+8. `extra_field` - (default: `[]`), 是个列表, 用于定义不在数据库表中但又与model相关的字段, 比如外键的反向查询, 多对多关系等等, 也可以用于定义任意其他跟model相关的字段. 注意如果指定了`extra_field`参数, `field_serializer_map`中必须有相应的serializer配合才能工作.
 
 e.g:
 
