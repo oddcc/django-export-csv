@@ -28,6 +28,10 @@ def generate_filename(queryset, add_datestamp=False):
     return filename
 
 
+def get_uncontain_field_names(list1, list2):
+    return [i for i in list1 if i not in list2]
+
+
 class Echo(object):
     """
     An file-like object that implements just the write method.
