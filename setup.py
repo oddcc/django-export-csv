@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='django-export-csv',
     version='0.1.2',
-    keywords=('django', 'csv', 'export', 'queryset'),
+    keywords=['django', 'csv', 'export', 'queryset'],
     description='a CSV exporter for Django',
     license='MIT License',
     long_description=open('README.md').read(),
