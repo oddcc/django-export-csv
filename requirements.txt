@@ -1,2 +1,2 @@
-django==1.8.8
+django>=1.8.8, <2.0
 unicodecsv==0.14.1

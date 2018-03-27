@@ -47,7 +47,7 @@ def _iter_csv(queryset, file_obj, **kwargs):
         queryset_values = queryset.values()
 
     fields = kwargs.get('fields', [])
-    exclude = kwargs.get('exclude', [])
+    exclude = kwargs.get('exclude_field', [])
     extra_field = kwargs.get('extra_field', [])
 
     if fields:
@@ -60,12 +60,16 @@ def _iter_csv(queryset, file_obj, **kwargs):
         field_names = fields
     elif exclude:
         field_names = [
-            field_name
-            for field_name in queryset_values.field_names
-            if field_name not in exclude
+            f.name
+            for f in queryset.model._meta.get_fields()
+            if not (f.is_relation or f.one_to_one or (f.many_to_one and f.related_model))
+               and f.name not in exclude
         ]
     else:
-        field_names = queryset_values.field_names
+        field_names = [f.name for f in queryset.model._meta.get_fields()
+                       if not (f.is_relation
+                               or f.one_to_one
+                               or (f.many_to_one and f.related_model))]
 
     field_names += extra_field
 
@@ -106,6 +110,7 @@ def _iter_csv(queryset, file_obj, **kwargs):
                 except AttributeError:
                     header_map[field.name] = field.name
 
+    kwargs.setdefault('field_names', field_names)
     header_map.update(kwargs.get('field_header_map', {}))
 
     yield writer.writerow(header_map)

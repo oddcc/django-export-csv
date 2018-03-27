@@ -58,20 +58,24 @@ class QueryCsvMixin(object):
 
         if self.fields:
             uncontain_field_names = get_uncontain_field_names(
-                    self.fields, queryset_values.field_names
-                )
+                self.fields, queryset_values.field_names
+            )
             if uncontain_field_names:
                 raise Exception(','.join(uncontain_field_names) + " aren't in default field names")
 
             field_names = self.fields
         elif self.exclude:
             field_names = [
-                field_name
-                for field_name in queryset_values.field_names
-                if field_name not in self.exclude
+                f.name
+                for f in queryset.model._meta.get_fields()
+                if not (f.is_relation or f.one_to_one or (f.many_to_one and f.related_model))
+                   and f.name not in self.exclude
             ]
         else:
-            field_names = queryset_values.field_names
+            field_names = [f.name for f in queryset.model._meta.get_fields()
+                           if not (f.is_relation
+                                   or f.one_to_one
+                                   or (f.many_to_one and f.related_model))]
 
         field_names += self.extra_field
 
