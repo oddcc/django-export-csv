@@ -6,7 +6,7 @@ import codecs
 
 from django.http import StreamingHttpResponse
 
-from export_csv import clean_filename, attach_datestamp, generate_filename, Echo, get_uncontain_field_names
+from django_export_csv import clean_filename, attach_datestamp, generate_filename, Echo, get_uncontain_field_names
 
 
 def render_csv_response(queryset, filename=None, add_datestamp=False, **kwargs):

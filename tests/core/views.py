@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from django.views.generic import ListView
 
 from tests.core.data_init import create_student_and_get_queryset, create_college_and_get_queryset
-from export_csv import QueryCsvMixin, render_csv_response
+from django_export_csv import QueryCsvMixin, render_csv_response
 
 
 def boolean_serializer(value):
