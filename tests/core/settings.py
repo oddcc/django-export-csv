@@ -1,18 +1,20 @@
+from __future__ import unicode_literals
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = 'HARD_TO_GUESS'
+SECRET_KEY = '+^jd4@x8l1353bu8)_*p_ii0l7q32+-6je!4*r7sx56y-&=!_8'
 
 DEBUG = True
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
+    'django.contrib.contenttypes',
+
+    'tests.core',
     'export_csv',
-)
+]
 
-MIDDLEWARE_CLASSES = ()
-
-ROOT_URLCONF = 'export_csv.urls'
+ROOT_URLCONF = 'tests.core.urls'
 
 DATABASES = {
     'default': {

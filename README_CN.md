@@ -1,4 +1,7 @@
 # django-export-csv
+[![Build Status](https://travis-ci.org/oddcc/django-export-csv.svg?branch=master)](https://travis-ci.org/oddcc/django-export-csv)
+[![Coverage Status](https://coveralls.io/repos/github/oddcc/django-export-csv/badge.svg?branch=develop)](https://coveralls.io/github/oddcc/django-export-csv?branch=develop)
+
 ## Introduction
 Django的一个CSV导出工具
 可以很方便的把queryset导出为CSV文件, 为了避免导出文件过大, 占用服务器内存, 生成的是StreamingHttpResponset.

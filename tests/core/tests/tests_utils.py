@@ -1,10 +1,11 @@
-import datetime
-
+#-*-coding:utf-8 -*-
+from __future__ import unicode_literals
+from __future__ import absolute_import
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from django_export_csv import utils
-from ..views import create_student_and_get_queryset
+from tests.core.data_init import create_student_and_get_queryset
+from export_csv import utils
 
 
 class CleanFilenameTests(TestCase):
@@ -54,9 +55,9 @@ class AttachDatestampTests(TestCase):
         filename = utils.attach_datestamp('测试文件.csv')
         self.assertRegexpMatches(filename, r'测试文件_[0-9]{8}.csv')
 
+
 class GenerateFileTests(TestCase):
     def test_can_generate_filename_from_model(self):
         queryset = create_student_and_get_queryset()
         self.assertEqual(utils.generate_filename(queryset), 'student.csv')
         self.assertRegexpMatches(utils.generate_filename(queryset, True), r'student_[0-9]{8}.csv')
-

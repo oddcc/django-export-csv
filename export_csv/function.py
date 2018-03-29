@@ -1,11 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import absolute_import
 import datetime
 import unicodecsv as csv
 import codecs
 
 from django.http import StreamingHttpResponse
 
-from .utils import generate_filename, attach_datestamp, clean_filename, get_uncontain_field_names
-from .utils import Echo
+from export_csv import clean_filename, attach_datestamp, generate_filename, Echo, get_uncontain_field_names
 
 
 def render_csv_response(queryset, filename=None, add_datestamp=False, **kwargs):
@@ -25,7 +26,7 @@ def render_csv_response(queryset, filename=None, add_datestamp=False, **kwargs):
         _iter_csv(queryset, Echo(), **kwargs), **response_args)
 
     # support chinese filename
-    response['Content-Disposition'] = b'attachment; filename=%s;' % filename.encode(encoding='utf-8')
+    response['Content-Disposition'] = b'attachment; filename=' + filename.encode(encoding='utf-8') + b';'
     response['Cache-Control'] = 'no-cache'
 
     return response

@@ -1,8 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import absolute_import
 import datetime
 
 from django.db import models
 
-from .models import Student, College
+from tests.core.models import College, Student
 
 
 def create_student_and_get_queryset():
