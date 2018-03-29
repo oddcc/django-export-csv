@@ -11,7 +11,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
 
     'tests.core',
-    'export_csv',
+    'django_export_csv',
 ]
 
 ROOT_URLCONF = 'tests.core.urls'
