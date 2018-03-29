@@ -17,7 +17,7 @@ class Tox(TestCommand):
 
 setup(
     name='django-export-csv',
-    version='0.1.3',
+    version='0.1.3.1',
     keywords=['django', 'csv', 'export', 'queryset'],
     description='A CSV exporter for Django, this tool create a shortcut to render a queryset to a CSV steaming HTTP response.',
     license='MIT License',
