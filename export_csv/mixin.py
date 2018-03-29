@@ -1,11 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import absolute_import
 import datetime
 import unicodecsv as csv
 import codecs
 
 from django.http import StreamingHttpResponse
 
-from .utils import clean_filename, attach_datestamp, generate_filename, get_uncontain_field_names
-from .utils import Echo
+from export_csv import clean_filename, attach_datestamp, generate_filename, Echo, get_uncontain_field_names
 
 
 class QueryCsvMixin(object):
@@ -36,7 +37,7 @@ class QueryCsvMixin(object):
             self._iter_csv(queryset, Echo()), **response_args)
 
         # support chinese filename
-        response['Content-Disposition'] = b'attachment; filename=%s;' % filename.encode(encoding='utf-8')
+        response['Content-Disposition'] = b'attachment; filename=' + filename.encode(encoding='utf-8') + b';'
         response['Cache-Control'] = 'no-cache'
 
         return response

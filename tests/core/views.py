@@ -1,3 +1,6 @@
+#-*-coding:utf-8 -*-
+from __future__ import unicode_literals
+from __future__ import absolute_import
 from django.views.generic import ListView
 
 from tests.core.data_init import create_student_and_get_queryset, create_college_and_get_queryset

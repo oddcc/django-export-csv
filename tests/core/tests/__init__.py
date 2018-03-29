@@ -1,2 +1,2 @@
-from .utils_tests import *
-from .request_tests import *
+from .tests_request import *
+from .tests_utils import *
