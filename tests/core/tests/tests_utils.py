@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from tests.core.data_init import create_student_and_get_queryset
-from export_csv import utils
+from django_export_csv import utils
 
 
 class CleanFilenameTests(TestCase):
