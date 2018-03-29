@@ -7,7 +7,7 @@ class Student(models.Model):
     is_graduated = models.BooleanField(default=False, verbose_name="Graduated")
     birthday = models.DateTimeField(verbose_name="Birthday")
     college = models.ForeignKey('College', verbose_name="Students's college", related_name='students')
-    
+
     def __str__(self):
         return self.name
 
