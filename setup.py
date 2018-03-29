@@ -37,10 +37,9 @@ setup(
         "Framework :: Django",
         "License :: OSI Approved :: GNU General Public License (GPL)"
     ],
-    packages=find_packages(exclude=('demo_app',)),
+    packages=find_packages(exclude=('tests',)),
     tests_require=[
         'tox',
-        'pytest-cov',
     ],
     cmdclass={'test': Tox},
 )
